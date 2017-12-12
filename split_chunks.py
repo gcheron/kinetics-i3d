@@ -42,6 +42,6 @@ for vidname in os.listdir( '%s/%s' % (FEATDIR,LOADFULLDIRNAME) ):
    for t in range(chunkNum):
       # save each chunk in independent files
       savename='%s/%s_%d_%d_%d.npy' % (savedir,PREFIXSAVENAME,Chunk_each,chunkNum,t+1)
-      sub=feat[0,t,:,:,:]
+      sub=np.transpose(feat[0,t,:,:,:],(2,0,1)) # save in C x H x W (torch format)
       #print(savename,sub.shape)
       np.save(savename,sub)
