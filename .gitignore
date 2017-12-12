@@ -1,2 +1,4 @@
 *.pyc
 .DS_Store
+preproc_jobs/job_list/
+preproc_jobs/logs/
