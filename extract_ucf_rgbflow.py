@@ -11,6 +11,10 @@ import i3d
 
 import pdb,re
 
+# commands:
+# python extract_ucf_rgbflow.py --eval_type rgb --vidlist /sequoia/data2/gcheron/UCF101/detection/OF_vidlist_all.txt
+# python extract_ucf_rgbflow.py --eval_type flow --vidlist /sequoia/data2/gcheron/UCF101/detection/OF_vidlist_all.txt
+
 _H_IMAGE_SIZE = 240 # 224
 _W_IMAGE_SIZE = 320 # 224
 _NUM_CLASSES = 400
@@ -121,8 +125,8 @@ def main(unused_argv):
            input_path = os.path.join(path,'I3D_rgb.npy')
     
         if eval_type == 'flow':
-           output_name = os.path.join(path,'I3D_features_OF.npy')
-           input_path = os.path.join(path,'I3D_OF.npy')
+           output_name = os.path.join(path,'I3D_features_OPF.npy')
+           input_path = os.path.join(path,'I3D_OPF.npy')
     
         #if not(os.path.isfile(output_name)):
         print(path)

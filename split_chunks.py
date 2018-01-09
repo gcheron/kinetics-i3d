@@ -7,8 +7,10 @@ import os
 
 FEATDIR='/sequoia/data2/gcheron/UCF101/I3D'
 IMDIR='/sequoia/data2/gcheron/UCF101/images'
-FEATNAME='I3D_features_RGB.npy'
-SAVESUBDIRNAME='subRGB'
+#FEATNAME='I3D_features_RGB.npy'
+FEATNAME='I3D_features_OPF.npy'
+#SAVESUBDIRNAME='subRGB'
+SAVESUBDIRNAME='subOPF'
 LOADFULLDIRNAME='full'
 PREFIXSAVENAME='chunk'
 

@@ -8,10 +8,6 @@ from skimage.transform import resize
 import re
 import pdb
 
-def normalization(im):
-    im = im-128
-    return im/128
-
 def center_crop(im):
     h,w = im.shape
 
@@ -34,9 +30,10 @@ def rescaling(im, dim=224,keep_ar=True):
          im=skimage.img_as_float(im)
       else:
          im=resize(im,(new_h,new_w)) # this also sends to [0,1] and convert
+      im=im[:,:,:2] # drop last channel
       return im
 
-root_dir = '/sequoia/data2/gcheron/UCF101/images/'
+root_dir = '/sequoia/data2/gcheron/UCF101/OF_closest/'
 res_dir ='/sequoia/data2/gcheron/UCF101/I3D/full'
 str_pattern = 'image-%05d.jpg'
 _h,_w=240,320
@@ -54,8 +51,7 @@ movie_list = [re.sub(' .*','',x.strip()) for x in movie_list]
 for vidn in movie_list:
     #vidn=movie_list[427]
     path=os.path.join(root_dir,vidn)
-    output_name = os.path.join(res_dir,vidn,'I3D_rgb.npy')
-
+    output_name = os.path.join(res_dir,vidn,'I3D_OPF.npy')
 
     if not(os.path.isfile(output_name)):
         rdi=os.path.join(res_dir,vidn)
@@ -64,12 +60,11 @@ for vidn in movie_list:
         n_files = len(all_files)
         print path
 
-        _tensor = np.zeros((1,n_files,_h,_w,3),dtype='float32')
+        _tensor = np.zeros((1,n_files,_h,_w,2),dtype='float32')
         for i in range(n_files):
             im=np.array(Image.open(os.path.join(path,str_pattern%(i+1))))
             im=rescaling(im,minSize,keepAR) # rescale and send to [0,1]
             _tensor[0,i,:,:,:] = im
 
         _tensor=_tensor*2-1 # [0,1] --> [0,2] --> [-1,1]
-
         np.save(output_name,_tensor)
