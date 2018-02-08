@@ -2,29 +2,50 @@
 # save the i-th chunk in FEATDIR/subRGB/{FEATNAME}_C_N_i (there are N chunks in the video and one chunk each C frames)
 # split_chunks.py FEATDIR FEATNAME IMDIR
 import numpy as np
-import subprocess
+#import subprocess
+import glob
 import os
+import ipdb
+import tstools.utils as tsutils
 
 FEATDIR='/sequoia/data2/gcheron/UCF101/I3D'
 IMDIR='/sequoia/data2/gcheron/UCF101/images'
-#FEATNAME='I3D_features_RGB.npy'
-FEATNAME='I3D_features_OPF.npy'
-#SAVESUBDIRNAME='subRGB'
-SAVESUBDIRNAME='subOPF'
+
+FEATDIR='/sequoia/data2/gcheron/DALY/I3D'
+IMDIR='/sequoia/data2/gcheron/DALY/images'
+
+#FEAT = 'RGB'
+FEAT = 'OPF'
+
+Chunk_each=4 # one chunk is extracted each N frames
+CHUNKEACH = 4
+
+if FEAT == 'RGB':
+   FEATNAME ='I3D_features_RGB'
+   SAVESUBDIRNAME ='subRGB'
+elif FEAT == 'OPF':
+   FEATNAME ='I3D_features_OPF'
+   SAVESUBDIRNAME ='subOPF'
+
+FVAR = {'chunkeach': Chunk_each, 'opfpat': FEATNAME}
+
 LOADFULLDIRNAME='full'
 PREFIXSAVENAME='chunk'
 
-Chunk_each=4 # one chunk is extracted each N frames
 
 vidcount=0
 for vidname in os.listdir( '%s/%s' % (FEATDIR,LOADFULLDIRNAME) ):
    # get number of frames
-   cmd='ls %s/%s/*.jpg | wc -l' % (IMDIR,vidname)
-   nframes=subprocess.Popen(cmd,shell=True,stdout=subprocess.PIPE)
-   nframes=int(nframes.stdout.read().rstrip())
+   #cmd='ls %s/%s/*.jpg | wc -l' % (IMDIR,vidname)
+   #nframes=subprocess.Popen(cmd,shell=True,stdout=subprocess.PIPE)
+   #nframes=int(nframes.stdout.read().rstrip())
+   nframes = len(glob.glob('%s/%s/*.jpg' % (IMDIR,vidname) ))
    
    # get the feature
-   feat=np.load('%s/%s/%s/%s' %(FEATDIR,LOADFULLDIRNAME,vidname,FEATNAME))
+   fpath = '%s/%s/%s' % (FEATDIR,LOADFULLDIRNAME,vidname)
+   feat = tsutils.merge_subvid_chunks(fpath, **FVAR)
+   if feat.ndim == 4:
+      feat = np.expand_dims(feat,0)
    bs,chunkNum,H,W,ch=feat.shape
    assert bs==1
 

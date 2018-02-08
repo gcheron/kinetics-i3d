@@ -9,16 +9,33 @@ import tensorflow as tf
 
 import i3d
 
-import pdb,re
+import ipdb,re
 
+# path:
+#   export LD_LIBRARY_PATH=/usr/local/cudnn/5.1/lib64:/sequoia/data2/gpunodes_shared_libs/cudnn/5.1/lib64:$LD_LIBRARY_PATH
+#
 # commands:
-# python extract_ucf_rgbflow.py --eval_type rgb --vidlist /sequoia/data2/gcheron/UCF101/detection/OF_vidlist_all.txt
-# python extract_ucf_rgbflow.py --eval_type flow --vidlist /sequoia/data2/gcheron/UCF101/detection/OF_vidlist_all.txt
+# generate list (vidlist contains files: I3D_rgb.npy or I3D_rgb_subXXXX.npy):
+#   cd /sequoia/data2/gcheron/DALY/I3D/full/ ; ls */I3D_rgb* > in_rgb_list.txt
+#   cd /sequoia/data2/gcheron/DALY/I3D/full/ ; ls */I3D_opf* > in_opf_list.txt
+#
+# extract features:
+# python extract_ucf_rgbflow.py --eval_type rgb --vidlist /sequoia/data2/gcheron/DALY/I3D/full/in_rgb_list.txt
+# python extract_ucf_rgbflow.py --eval_type flow --vidlist /sequoia/data2/gcheron/DALY/I3D/full/in_opf_list.txt
 
-_H_IMAGE_SIZE = 240 # 224
-_W_IMAGE_SIZE = 320 # 224
+DATASET = 'DALY'
+
+if DATASET == 'DALY':
+   _H_IMAGE_SIZE = 240 # 360
+   _W_IMAGE_SIZE = 320 # 640
+   root_dir = '/sequoia/data2/gcheron/DALY/I3D/full'
+elif DATASET == 'UCF101':
+   _H_IMAGE_SIZE = 240 # 224
+   _W_IMAGE_SIZE = 320 # 224
+   root_dir = '/sequoia/data2/gcheron/UCF101/I3D/full'
+
 _NUM_CLASSES = 400
-_MAX_LEN=1500
+_MAX_LEN= 1000
 _ENDPOINT= 'Mixed_4f' # 'Logits' #'Mixed_5c'
 
 _CHECKPOINT_PATHS = {
@@ -39,7 +56,6 @@ tf.flags.DEFINE_string('vidlist','', 'list of videos')
 
 def main(unused_argv):
 
-  root_dir = '/sequoia/data2/gcheron/UCF101/I3D/full' 
 
   tf.logging.set_verbosity(tf.logging.INFO)
   eval_type = FLAGS.eval_type
@@ -102,7 +118,9 @@ def main(unused_argv):
   for movie in movie_list:
       #movie=movie_list[427]
       print(movie)
-      path = os.path.join(root_dir, movie)
+      input_path = os.path.join(root_dir, movie)
+      rres = re.match('([^/]*).*',movie)
+      vidname = rres.group(1)
 
       with tf.Session() as sess:
         feed_dict = {}
@@ -118,18 +136,22 @@ def main(unused_argv):
           else:
             flow_saver.restore(sess, _CHECKPOINT_PATHS['flow'])
     
-        #pdb.set_trace()
-    
         if eval_type == 'rgb':
-           output_name = os.path.join(path,'I3D_features_RGB.npy')
-           input_path = os.path.join(path,'I3D_rgb.npy')
-    
+           o_str = 'I3D_features_RGB'
         if eval_type == 'flow':
-           output_name = os.path.join(path,'I3D_features_OPF.npy')
-           input_path = os.path.join(path,'I3D_OPF.npy')
+           o_str = 'I3D_features_OPF'
+
+        output_name = os.path.join(root_dir, vidname, o_str)
+
+        # check if from sub
+        rres = re.match('([^/]*/I3D_.*_)(sub.*)(.npy)',movie)
+        if rres:
+           output_name += '_' + rres.group(2)
+
+        output_name += '.npy'
     
         #if not(os.path.isfile(output_name)):
-        print(path)
+        print(input_path)
         sample = np.load(input_path)
            
         assert sample.shape[1] <= _MAX_LEN

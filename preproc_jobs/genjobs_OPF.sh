@@ -3,7 +3,8 @@
 job_list="job_list"
 
 n=0
-for i in /sequoia/data1/gcheron/code/torch/lstm_time_detection/dataset/splitlists/sub/all_vidlist_sub*
+#for i in /sequoia/data1/gcheron/code/torch/lstm_time_detection/dataset/splitlists/sub/all_vidlist_sub*
+for i in /sequoia/data1/gcheron/code/torch/lstm_time_detection/dataset/splitlistsDALY/sub/all_vidlist_sub*
 do
 n=$(($n+1))
 
@@ -22,7 +23,7 @@ echo "export PATH="/sequoia/data1/gcheron/lib/anaconda2/bin:/sequoia/data3/gcher
 echo "export LD_LIBRARY_PATH="/sequoia/data3/gcheron/torch/torch_install_bigmem/install/lib:/usr/local/cudnn/5.0/lib64:/sequoia/data2/gpunodes_shared_libs/cudnn/5.0/lib64:/cm/shared/apps/sge/2011.11p1/lib/linux-x64:/cm/shared/apps/gcc/4.8.1/lib:/cm/shared/apps/gcc/4.8.1/lib64:/usr/local/cuda-7.5/lib64:"
 
 echo "cd /sequoia/data1/gcheron/code/tensorflow/kinetics-i3d"
-echo "python preprocess_myflow.py $i"
+echo "python preprocess_rgbopf.py $i opf"
 echo "echo JOB DONE"
 } > $job_list/$JOBNAME.pbs
 
