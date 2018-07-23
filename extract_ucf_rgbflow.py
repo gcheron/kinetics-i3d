@@ -23,7 +23,7 @@ import ipdb,re
 # python extract_ucf_rgbflow.py --eval_type rgb --vidlist /sequoia/data2/gcheron/DALY/I3D/full/in_rgb_list.txt
 # python extract_ucf_rgbflow.py --eval_type flow --vidlist /sequoia/data2/gcheron/DALY/I3D/full/in_opf_list.txt
 
-DATASET = 'DALY'
+DATASET = 'AVA'
 
 if DATASET == 'DALY':
    _H_IMAGE_SIZE = 240 # 360
@@ -33,6 +33,10 @@ elif DATASET == 'UCF101':
    _H_IMAGE_SIZE = 240 # 224
    _W_IMAGE_SIZE = 320 # 224
    root_dir = '/sequoia/data2/gcheron/UCF101/I3D/full'
+elif DATASET == 'AVA':
+   _H_IMAGE_SIZE = 240 # 224
+   _W_IMAGE_SIZE = 320 # 224
+   root_dir = '/sequoia/data2/dataset/AVA/I3D/full'
 
 _NUM_CLASSES = 400
 _MAX_LEN= 1000
@@ -117,7 +121,6 @@ def main(unused_argv):
 
   for movie in movie_list:
       #movie=movie_list[427]
-      print(movie)
       input_path = os.path.join(root_dir, movie)
       rres = re.match('([^/]*).*',movie)
       vidname = rres.group(1)
@@ -151,7 +154,7 @@ def main(unused_argv):
         output_name += '.npy'
     
         #if not(os.path.isfile(output_name)):
-        print(input_path)
+        pstr = input_path
         sample = np.load(input_path)
            
         assert sample.shape[1] <= _MAX_LEN
@@ -181,6 +184,7 @@ def main(unused_argv):
           features = sess.run(model_features,feed_dict=feed_dict)
           np.save(output_name,features)
           print(sample.shape,' ----> ',features.shape)
+        print(pstr + '\n' + output_name)
 
 
 if __name__ == '__main__':

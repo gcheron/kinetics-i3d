@@ -11,7 +11,7 @@ from tstools import utils
 import math
 
 # command
-# python preprocess_rgbopf.py /sequoia/data1/gcheron/code/torch/lstm_time_detection/dataset/splitlistsDALY/sub/all_vidlist_sub29.txt opf
+# python preprocess_rgbopf.py /sequoia/data1/gcheron/code/torch/lstm_time_detection/dataset/splitlistsDALY/sub/all_vidlist_sub29.txt opf DALY
 
 def normalization(im):
     im = im-128
@@ -44,8 +44,8 @@ def rescaling(im, dim=224,keep_ar=True):
 #movies='/sequoia/data2/gcheron/UCF101/detection/OF_vidlist_all.txt'
 movies = sys.argv[1]
 featstr = sys.argv[2]
+dataset = sys.argv[3]
 
-dataset = 'DALY'
 if dataset == 'UCF101':
    if featstr == 'rgb':
       root_dir = '/sequoia/data2/gcheron/UCF101/images/'
@@ -60,6 +60,11 @@ elif dataset == 'DALY':
       root_dir = '/sequoia/data2/gcheron/DALY/OF_closest/'
    res_dir ='/sequoia/data2/gcheron/DALY/I3D/full'
    #_h,_w=360,640
+   _h,_w=240,320
+elif dataset == 'AVA':
+   if featstr == 'rgb':
+      root_dir = '/sequoia/data2/dataset/AVA/images/'
+   res_dir ='/sequoia/data2/dataset/AVA/I3D/full'
    _h,_w=240,320
 
 str_pattern = 'image-%05d.jpg'
@@ -134,7 +139,7 @@ for vidn in movie_list:
                 elif i == cur_n - 1:
                   strinfo += '\n       to %s' % impath
     
-                if dataset == 'DALY':
+                if dataset in ('DALY', 'AVA'):
                    im = utils.padding(im,_h,_w) # pad and send to [0,1]
                 else:
                    im=rescaling(im,minSize,keepAR) # rescale and send to [0,1]
